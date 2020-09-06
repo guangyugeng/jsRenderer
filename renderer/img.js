@@ -11,14 +11,14 @@ class GuaImg extends GuaObject {
         // log(axe3dString)
         let m = this.new()
         let axeImgLL = axeImgString.split('\n')
-        let w = Math.floor(axeImgString.split('\n')[3])
-        let h = Math.floor(axeImgString.split('\n')[4])
+        let w = Math.floor(axeImgString.split('\n')[2])
+        let h = Math.floor(axeImgString.split('\n')[2])
         log('Img',w, h)
         m.w = w, m.h = h
         let p, c, v, axeImgL, r, g, b, a
         for (var i = 0; i < h; i++) {
             m.imgBuffer.push([])
-            axeImgL = axeImgLL[i+5].split('#')
+            axeImgL = axeImgLL[i+4].split('#')
             // log(axeImgL)
             // break
             for (var j = 0; j < w; j++){

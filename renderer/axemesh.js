@@ -86,84 +86,16 @@ class Axemesh extends GuaObject{
 
         // var triangles = []
         let axe3dL = axe3dString.split('\n')
-        let len = Math.floor(axe3dString.split('\n')[3].split(' ')[1])
-        // log(len)
-        for (var i = 4; i < 3+len; i++) {
-            // log(axe3dL[i])
-            let p1, p2, p3, c1, c2, c3, v1, v2, v3
-            let nums = axe3dL[i].split(/[# ]/).map((e) => {
-                return parseFloat(e)
-            })
-            // log(nums)
-            p1 = GuaVector.new(nums[0], nums[1], nums[2])
-            p2 = GuaVector.new(nums[5], nums[6], nums[7])
-            p3 = GuaVector.new(nums[10], nums[11], nums[12])
+        let verLen = Math.floor(axe3dString.split('\n')[2].split(' ')[1])
+        let triLen = Math.floor(axe3dString.split('\n')[3].split(' ')[1])
+        log(verLen, triLen)
+        m.vertices = m.verticesFromVerL(axe3dString.split('\n').slice(4,4+verLen), verLen)
+        m.triangles = m.trianglesFromVriL(axe3dString.split('\n').slice(4+verLen), triLen)
 
-            let imgNums = [nums[3], nums[4], nums[8], nums[9], nums[13], nums[14]].map((e) => {
-                if (e >= 1) {
-                   return 0.99
-                } else if (e < 0) {
-                  // log('e0', e)
-                    return 0
-                } else {
-                   return e
-                }
-            })
-            // let uL = [int(w*imgNums[0]), int(w*imgNums[2]), int(w*imgNums[4])]
-            // let vL = [int(h*imgNums[1]), int(h*imgNums[3]), int(h*imgNums[5])]
-            // c1 = img.imgBuffer[vL[0]][uL[0]]
-            // c2 = img.imgBuffer[vL[1]][uL[1]]
-            // c3 = img.imgBuffer[vL[2]][uL[2]]
-
-            // v1 = GuaVertex.new(p1, c1, uL[0], vL[0])
-            // v2 = GuaVertex.new(p2, c2, uL[1], vL[1])
-            // v3 = GuaVertex.new(p3, c3, uL[2], vL[2])
-            let cn = GuaVector.new(5, 4, 10)
-            v1 = GuaVertex.new(p1, GuaColor.blue(), cn, imgNums[0], imgNums[1])
-            v2 = GuaVertex.new(p2, GuaColor.blue(), cn, imgNums[2], imgNums[3])
-            v3 = GuaVertex.new(p3, GuaColor.blue(), cn, imgNums[4], imgNums[5])
-            // v1 = GuaVertex.new(p1, GuaColor.green())
-            // v2 = GuaVertex.new(p2, GuaColor.red())
-            // v3 = GuaVertex.new(p3, GuaColor.blue())
-            // break
-            // v3 = GuaVertex.new(p3, GuaColor.random())
-            // log(v1, v2, v3)
-            // break
-            let triangle = [v1, v2, v3]
-            m.triangles.push(triangle)
-            // }
-        }
         m.img = img
         return m
 
     }
-    update(vertices) {
-    let self = this
-    let len = self.triangles.length
-    let index = 0
-    for (let i = 0; i < len; i++) {
-        self.triangles[i][0].update_xyz(vertices[index])
-        self.triangles[i][1].update_xyz(vertices[index + 1])
-        self.triangles[i][2].update_xyz(vertices[index + 2])
-        index += 3
-    }
-}
-    // static fromAxe3D(axe3dString, img) {
-    //     // log(axe3dString.split('\n')[2].split(' '))
-    //     let m = this.new()
-    //
-    //     // var triangles = []
-    //     let axe3dL = axe3dString.split('\n')
-    //     let verLen = Math.floor(axe3dString.split('\n')[2].split(' ')[1])
-    //     let triLen = Math.floor(axe3dString.split('\n')[3].split(' ')[1])
-    //     log(verLen, triLen)
-    //     m.vertices = m.verticesFromVerL(axe3dString.split('\n').slice(4,4+verLen), verLen)
-    //     m.triangles = m.trianglesFromVriL(axe3dString.split('\n').slice(4+verLen), triLen)
-    //
-    //     m.img = img
-    //     return m
-    //
-    // }
     // static fromAxe3D(axe3dString) {
     //     // log(axe3dString)
     //     let m = this.new()

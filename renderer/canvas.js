@@ -332,23 +332,25 @@ class GuaCanvas extends GuaObject {
         for (let t of triangles) {
             // log("ttt", t)
             // 拿到三角形的三个顶点
-            let a = t[0]
-            let b = t[1]
-            let c = t[2]
-            //light and back
+            let a = vertices[t[0]]
+            let b = vertices[t[1]]
+            let c = vertices[t[2]]
+            //light
+            // log('world.transform(a)', world.transform(a))
+            // let [ap, bp, cp] = [a.position, b.position, c.position]
+            // let worldTriangle = [ap, bp, cp].map(v => world.transform(v))
+            let worldTrianglePosition = [a.position, b.position, c.position].map(v => world.transform(v))
+            let worldTriangleNormal = [a.n, b.n, c.n].map(v => rotation.transform(v))
+            // let [a2, b2, c2] = [a1, b1, c1].map(v => this.project(v, trans))
+            // log('worldTriangle', worldTriangle)
 
-            // let worldTrianglePosition = [a.position, b.position, c.position].map(v => world.transform(v))
-            // let worldTriangleNormal = [a.n, b.n, c.n].map(v => rotation.transform(v))
-            // let cos = this.calculateCos(this.light, worldTriangleNormal, worldTrianglePosition)
-            // let cn = GuaVector.new(5, 4, 10)
-            // let backFlag = this.isBack(cn, worldTriangleNormal)
-            // if (backFlag >= 0) {
-            //     continue
-            // }
-            let cos = 0.9
-            // if (this.isBackTriangles(a, b, c, rotation, world)) {
-            //     break
-            // }
+            let cos = this.calculateCos(this.light, worldTriangleNormal, worldTrianglePosition)
+            let cn = GuaVector.new(5, 4, 10)
+            // log(this.camera.cn)
+            let backFlag = this.isBack(cn, worldTriangleNormal)
+            if (backFlag >= 0) {
+                continue
+            }
             // if (backFlag  > 0.3) {
             //     continue
             // }
@@ -357,31 +359,14 @@ class GuaCanvas extends GuaObject {
             let [v1, v2, v3] = [a, b, c].map(v => this.project(v, transform))
 
 
-            // log("v123", v1, v2, v3)
-
+            // log('v123', v1.position,v2.position,v3.position)
+            // log('abc', a.position,b.position,c.position)
+            // log('a2', a2.position,b2.position,c2.position)
             this.drawTriangle(v1, v2, v3, cos)
             // break
         }
     }
 
-    // isBackTriangles(a, b, c, rotation, world) {
-    //     // log(rotation, world)
-    //     let worldTrianglePosition = [a.position, b.position, c.position].map(v => world.transform(v))
-    //     let worldTriangleNormal = [a.n, b.n, c.n].map(v => rotation.transform(v))
-    //     // let [a2, b2, c2] = [a1, b1, c1].map(v => this.project(v, trans))
-    //     // log('worldTriangle', worldTriangle)
-    //
-    //     let cos = this.calculateCos(this.light, worldTriangleNormal, worldTrianglePosition)
-    //     let cn = GuaVector.new(5, 4, 10)
-    //     // log(this.camera.cn)
-    //     let backFlag = this.isBack(cn, worldTriangleNormal)
-    //     if (backFlag >= 0) {
-    //         return 1
-    //     } else {
-    //         return 0
-    //     }
-    //     // return backFlag
-    // }
     isBack(cn, worldTriangleNormal) {
         //camera n
         let n = worldTriangleNormal

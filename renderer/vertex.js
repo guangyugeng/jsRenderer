@@ -29,11 +29,4 @@ class GuaVertex extends GuaObject {
         }
 
     }
-    update_xyz(l) {
-    let self = this
-    self.position.x = l[0]
-    self.position.y = l[1]
-    self.position.z = l[2]
-    }
-
 }
