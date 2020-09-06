@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>triangle</title>
+        <style>
+            canvas {
+                outline: 1px dashed lightskyblue;
+            }
+        </style>
+        <!-- 引入所有用到的文件 -->
+        <script src='renderer/gua_object.js'></script>
+        <script src='renderer/utils.js'></script>
+        <script src='renderer/vector.js'></script>
+        <script src='renderer/vertex.js'></script>
+        <script src='renderer/color.js'></script>
+        <script src='renderer/canvas.js'></script>
+        <script src='renderer/axemesh.js'></script>
+        <script src='renderer/matrix.js'></script>
+        <script src='renderer/normal.js'></script>
+        <script src='renderer/img.js'></script>
+        <script src='renderer/axe_img.js'></script>
+        <script src='renderer/axe_gua3d.js'></script>
+        <script src='renderer/config.js'></script>
+        <!-- <script type="text" src='axe17-axe3d/cones.axe3d'></script> -->
+    </head>
+    <body>
+      <!-- <canvas id="id-canvas" width="400" height="300"></canvas> -->
+      <canvas id="id-canvas" width="500" height="500"></canvas>
+      <div class="config">
+      </div>
+        <!-- <input type="file" id="inputBox"> -->
+
+<script>
+// 函数名应该用 const 修饰, 这样不会被意外修改
+const __main = function() {
+    var canvas = GuaCanvas.new('#id-canvas')
+    // 初始化滑动条
+    initConfigInput()
+
+    let img = GuaImg.fromGuaImg(axeImgString)
+    let mesh = Axemesh.fromAxe3D(axe3dString, img)
+    mesh.rotation.y = -0.9
+
+    canvas.clear()
+    canvas.draw3d(mesh)
+    // canvas.drawImg(img)
+    canvas.render()
+    setInterval(function () {
+        canvas.clear()
+       // 在这里配置
+        canvas.camera = GuaCamera.new()
+        mesh.rotation.x = config.rotation_x.value
+        mesh.rotation.y = config.rotation_y.value
+        mesh.rotation.z = config.rotation_z.value
+
+        canvas.draw3d(mesh)
+        canvas.render()
+    }, 2000)
+    // setInterval(function() {
+    //     canvas.clear()
+    //     // mesh.rotation.x += 0.1
+    //     // mesh.rotation.y += 0.1
+    //     canvas.light.z -= 1
+    //     canvas.draw3d(mesh)
+    //     //
+    //     canvas.render()
+    // }, 1000)
+
+    // let axemesh = Axemesh.new()
+    // log(axemesh)
+    // 这是一个测试函数, 给你看原理的, 只是看看
+    // canvas.__debug_draw_demo()
+    // let p1 = GuaVector.new(10, 10, 1)
+    // let p2 = GuaVector.new(50, 50, 1)
+    // let p3 = GuaVector.new(5, 100, 1)
+    // let v1 = GuaVertex.new(p1, GuaColor.green())
+    // let v2 = GuaVertex.new(p2, GuaColor.red())
+    // let v3 = GuaVertex.new(p3, GuaColor.blue())
+    // canvas.drawTriangle(v1, v2, v3)
+    //
+    // let p4 = GuaVector.new(20, 10, 2)
+    // let p5 = GuaVector.new(50, 60, 2)
+    // let p6 = GuaVector.new(15, 100, 2)
+    // let v4 = GuaVertex.new(p4, GuaColor.green())
+    // let v5 = GuaVertex.new(p5, GuaColor.red())
+    // let v6 = GuaVertex.new(p6, GuaColor.blue())
+    // canvas.drawTriangle(v4, v5, v6)
+    //
+    // // 渲染出来, 不调用这个函数就不会显示结果
+    // canvas.render()
+
+}
+
+__main()
+</script>
+    </body>
+</html>
