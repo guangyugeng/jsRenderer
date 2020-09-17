@@ -19,6 +19,7 @@
         <script src='renderer/matrix.js'></script>
         <script src='renderer/normal.js'></script>
         <script src='renderer/img.js'></script>
+        <script src='renderer/gbuffer.js'></script>
         <script src='renderer/axe_img.js'></script>
         <script src='renderer/axe_gua3d.js'></script>
         <script src='renderer/config.js'></script>
@@ -43,18 +44,22 @@ const __main = function() {
     mesh.rotation.y = -0.9
 
     canvas.clear()
-    canvas.draw3d(mesh)
+    // canvas.draw3d(mesh)
+    canvas.geometryPass(mesh)
     // canvas.drawImg(img)
     canvas.render()
     setInterval(function () {
         canvas.clear()
+        canvas.gbuffer.clear()
        // 在这里配置
         canvas.camera = GuaCamera.new()
         mesh.rotation.x = config.rotation_x.value
         mesh.rotation.y = config.rotation_y.value
         mesh.rotation.z = config.rotation_z.value
+        // log(canvas.gbuffer.normal  Buffer[0][0])
 
-        canvas.draw3d(mesh)
+        canvas.geometryPass(mesh)
+        // canvas.draw3d(mesh)
         canvas.render()
     }, 2000)
     // setInterval(function() {

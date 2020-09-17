@@ -1,5 +1,4 @@
-class GuaNormal extends GuaObject {
-    // 表示颜色的类
+class GuaNormal extends GuaVector {
     constructor(x, y, z) {
         super()
         this.x = x
