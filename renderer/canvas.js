@@ -63,7 +63,6 @@ class GuaCanvas extends GuaObject {
     }
 
     render() {
-
         let {pixels, context} = this
         // log(this.gbuffer.colorBuffer[100][100])
         this.setPixelFromColorBuffer()
@@ -88,7 +87,11 @@ class GuaCanvas extends GuaObject {
                 }
             }
         }
-        this.render()
+        log('clear over ')
+        let {pixels, context} = this
+
+        context.putImageData(pixels, 0, 0)
+        // this.render()
     }
 
     calculateCos(light, tn, worldTrianglePosition) {
@@ -100,7 +103,6 @@ class GuaCanvas extends GuaObject {
       // let tn = GuaVector.center(n[0],n[1],n[2])
       //光线向量
       let ln = p.sub(light)
-
       let cos = ln.cos(tn)
       return cos
     }
@@ -110,26 +112,40 @@ class GuaCanvas extends GuaObject {
       // let worldTriangleNormal = [a.n, b.n, c.n].map(v => rotation.transform(v))
       // let [a2, b2, c2] = [a1, b1, c1].map(v => this.project(v, trans))
       // log('worldTriangle', worldTriangle)
-      let ln = (position.sub(this.light)).normalize()
-      let cos = ln.cos(normal.normalize())
-      // log(cos)
-      // let cos = this.calculateCos(this.light, normal, position)
+      let lightColor
+      if(normal.x != undefined)
+      {
+        let ln = (position.sub(this.light)).normalize()
+        let cos = ln.cos(normal.normalize())
+        // log(cos)
+        // let cos = this.calculateCos(this.light, normal, position)
+          if (cos > 1) {
+              cos = 1
+          } else if (cos < 0) {
+              cos = 0
+          }
+          // log(linColor.r, typeof(linColor.r))
+          // if (cos <= 1 && cos >= 0 ){
+          let factor = 0.7 + cos * 0.3
+          // let factor = 1
+          // if(color.r * factor >= 255){
+          //     log(color.r)
+          // }
+          // log(color.r, color.g, color.b)
+          let r = Math.min(color.r * factor, 255)
+          let g = Math.min(color.g * factor, 255)
+          let b = Math.min(color.b * factor, 255)
+          lightColor = GuaColor.new(r, g, b, color.a)
 
-        if (cos > 1) {
-            cos = 1
-        } else if (cos < 0) {
-            cos = 0
-        }
-        // log(linColor.r, typeof(linColor.r))
-        // if (cos <= 1 && cos >= 0 ){
-        let factor = 0.5 + cos * 0.5
-        // let factor = 1
-        let r = Math.min(color.r * factor, 255)
-        let g = Math.min(color.g * factor, 255)
-        let b = Math.min(color.b * factor, 255)
+      }else {
+        lightColor = GuaColor.new(255, 255, 255, color.a)
+      }
 
+                // if(lightColor.r == 0)
+                // {
+                //   log(color)
+                // }
 
-        let lightColor = GuaColor.new(r, g, b, color.a)
         return lightColor
 
     }
@@ -147,16 +163,7 @@ class GuaCanvas extends GuaObject {
 
             // alpha混合
             if(colorBuffer[x][y].r != undefined){
-              // let lightColor
-              // try {
-              //   lightColor = this.calculateLightColor(colorBuffer[x][y], normalBuffer[x][y], positionBuffer[x][y])
-              //
-              // } catch (e) {
-              //   // log(colorBuffer[x][y], normalBuffer[x][y], positionBuffer[x][y])
-              //   // log(normalBuffer[x][y])
-              // } finally {
-              //
-              // }
+
               let lightColor = this.calculateLightColor(colorBuffer[x][y], normalBuffer[x][y], positionBuffer[x][y])
 
               let i = (y * this.w + x) * this.bytesPerPixel
@@ -208,7 +215,7 @@ class GuaCanvas extends GuaObject {
 
     //
 
-        drawPoint(point, color=GuaColor.black(), passName, worldTriangleNormal, worldTrianglePosition) {
+        drawPoint(point, color=GuaColor.white(), passName, worldTriangleNormal, worldTrianglePosition) {
             // point: GuaVector
             let {w, h} = this
             let p = point
@@ -223,17 +230,17 @@ class GuaCanvas extends GuaObject {
                       // let n = worldTriangleNormal
                       // let tn = GuaVector.center(n[0],n[1],n[2])
 
-                      let cn = GuaVector.new(5, 4, 10)
-                      let backFlag = cn.cos(worldTriangleNormal)
-                      // let backFlag = this.isBack(point, worldTriangleNormal)
-                      if (backFlag <= 0) {
+                      // let cn = GuaVector.new(5, 4, 10)
+                      // let backFlag = cn.cos(worldTriangleNormal)
+                      // // let backFlag = this.isBack(point, worldTriangleNormal)
+                      // if (backFlag <= 0) {
                         if (this.zBuffer[x][y] == 0 || this.zBuffer[x][y] >= p.z) {
                             this.zBuffer[x][y] = p.z
                             this.gbuffer.colorBuffer[x][y] = color
                             this.gbuffer.normalBuffer[x][y] = worldTriangleNormal
                             this.gbuffer.positionBuffer[x][y] = p
                         }
-                      }
+                      // }
                       // if(worldTriangleNormal[0] == undefined){
                       //   log(worldTriangleNormal)
                       // }
@@ -551,8 +558,6 @@ class GuaCanvas extends GuaObject {
             for (var x = 0; x < w; x++) {
                 p = GuaVector.new(x,y,1)
                 c = img.imgBuffer[y][x]
-                // log('p', p)
-                // break
                 this.drawPoint(p, c)
             }
 

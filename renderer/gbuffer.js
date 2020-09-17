@@ -7,7 +7,6 @@ class GuaGBuffer extends GuaObject {
         this.normalBuffer = this.initBuffer(w, h, 'normal')
         this.positionBuffer = this.initBuffer(w, h, 'position')
         this.colorBuffer = this.initBuffer(w, h, 'color')
-
         this.zBuffer = this.initBuffer(w, h,'z')
     }
 
@@ -32,7 +31,6 @@ class GuaGBuffer extends GuaObject {
                  default:
                     // 默认代码块
               }
-              // a.push(0)
           }
           buffer.push(a)
       }
@@ -40,10 +38,11 @@ class GuaGBuffer extends GuaObject {
     }
 
 
-    clear(color=GuaColor.new(), normal=GuaNormal.new(), position=GuaVector.new()){
+    clear(color=GuaColor.white(), normal=GuaNormal.new(), position=GuaVector.new()){
       for (let x = 0; x < this.w; x++) {
           for (let y = 0; y < this.h; y++) {
               this.colorBuffer[x][y] = color
+              // log(color)
               this.normalBuffer[x][y] = normal
               this.positionBuffer[x][y] = position
               // x = Math.round(x), y = Math.round(y)

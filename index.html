@@ -48,10 +48,22 @@ const __main = function() {
     canvas.geometryPass(mesh)
     // canvas.drawImg(img)
     canvas.render()
-    setInterval(function () {
-        canvas.clear()
+    log("gbuffer clear")
+
         canvas.gbuffer.clear()
-       // 在这里配置
+        log("clear")
+
+        canvas.clear()
+
+        log(canvas.gbuffer.colorBuffer[0][0])
+        // canvas.render()
+
+        log("clear")
+    setInterval(function () {
+      // canvas.gbuffer.clear()
+
+        canvas.clear()
+        log("clear")
         canvas.camera = GuaCamera.new()
         mesh.rotation.x = config.rotation_x.value
         mesh.rotation.y = config.rotation_y.value
@@ -59,6 +71,8 @@ const __main = function() {
         // log(canvas.gbuffer.normal  Buffer[0][0])
 
         canvas.geometryPass(mesh)
+        // log("geometryPass")
+
         // canvas.draw3d(mesh)
         canvas.render()
     }, 2000)
