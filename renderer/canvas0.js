@@ -93,7 +93,7 @@ class GuaCanvas extends GuaObject {
         context.putImageData(pixels, 0, 0)
         // this.render()
     }
-    //
+    // 
     // calculateCos(light, tn, worldTrianglePosition) {
     //   let p = worldTrianglePosition
     //   // let n = worldTriangleNormal
@@ -303,7 +303,7 @@ class GuaCanvas extends GuaObject {
             }
 
         }
-        drawScanline(v1, v2, passName, worldTriangleNormal, worldTrianglePosition) {
+        drawScanline(v1, v2, cos, passName, worldTriangleNormal, worldTrianglePosition) {
             // log('v12',v1,v2)
             let {w, h} = this
             let [iw, ih] = [this.img.w, this.img.h]
@@ -342,19 +342,19 @@ class GuaCanvas extends GuaObject {
                         // log(linColor)
                         // linColor = GuaColor.white()
                         // log
-                        // if (cos > 1) {
-                        //     cos = 1
-                        // } else if (cos < 0) {
-                        //     cos = 0
-                        // }
-                        // // log(linColor.r, typeof(linColor.r))
-                        // // if (cos <= 1 && cos >= 0 ){
-                        // let factor = 0.5 + cos * 0.5
-                        // let r = Math.min(linColor.r * factor, 255)
-                        // let g = Math.min(linColor.g * factor, 255)
-                        // let b = Math.min(linColor.b * factor, 255)
-                        //
-                        // let lightColor = GuaColor.new(r, g, b, linColor.a)
+                        if (cos > 1) {
+                            cos = 1
+                        } else if (cos < 0) {
+                            cos = 0
+                        }
+                        // log(linColor.r, typeof(linColor.r))
+                        // if (cos <= 1 && cos >= 0 ){
+                        let factor = 0.5 + cos * 0.5
+                        let r = Math.min(linColor.r * factor, 255)
+                        let g = Math.min(linColor.g * factor, 255)
+                        let b = Math.min(linColor.b * factor, 255)
+
+                        let lightColor = GuaColor.new(r, g, b, linColor.a)
                         // log(linColor)
 
                         // console.assert(linColor.b > 0, "rgb = 0");
@@ -381,7 +381,7 @@ class GuaCanvas extends GuaObject {
                 }
             // }
         }
-        drawHalfTriangle(a, b, c, flag=1, passName, worldTriangleNormal, worldTrianglePosition) {
+        drawHalfTriangle(a, b, c, flag=1, cos, passName, worldTriangleNormal, worldTrianglePosition) {
           //flag判断是上半还是下半, 1是上半
             // log('color',a,b,c)
             let sx, ex, sc, ec
@@ -439,13 +439,13 @@ class GuaCanvas extends GuaObject {
 
                 // let v1 = GuaVertex.new(p1, GuaColor.white())
                 // let v2 = GuaVertex.new(p2, GuaColor.white())
-                this.drawScanline(v1, v2, passName, worldTriangleNormal, worldTrianglePosition)
+                this.drawScanline(v1, v2, cos, passName, worldTriangleNormal, worldTrianglePosition)
                 // break
             }
 
         }
 
-        drawTriangle(v1, v2, v3, passName, worldTriangleNormal, worldTrianglePosition) {
+        drawTriangle(v1, v2, v3, cos, passName, worldTriangleNormal, worldTrianglePosition) {
             // log('v123',v1, v2, v3)
             let {w, h} = this
             let minV, maxV
@@ -456,8 +456,8 @@ class GuaCanvas extends GuaObject {
                   return -1 //返回负数 ，a排列在b之前
                 }
             })
-            this.drawHalfTriangle(a, b, c, 1, passName, worldTriangleNormal, worldTrianglePosition)
-            this.drawHalfTriangle(a, b, c, 0, passName, worldTriangleNormal, worldTrianglePosition)
+            this.drawHalfTriangle(a, b, c, 1, cos, passName, worldTriangleNormal, worldTrianglePosition)
+            this.drawHalfTriangle(a, b, c, 0, cos, passName, worldTriangleNormal, worldTrianglePosition)
         }
 
 
@@ -482,24 +482,31 @@ class GuaCanvas extends GuaObject {
         const rotation = Matrix.rotation(mesh.rotation)
         const translation = Matrix.translation(mesh.position)
         const world = rotation.multiply(translation)
+        // let trans = view.multiply(projection)
         const transform = world.multiply(view).multiply(projection)
+
         let vertices = mesh.vertices
         let triangles = mesh.triangles
 
         // let l = GuaVertex.new(this.light, GuaColor.black(), this.light, 0, 0)
         // triangles = triangles.sort((a, b) => -(vertices[a[0]].position.z - vertices[b[0]].position.z))
         for (let t of triangles) {
+            // log("ttt", t)
             // 拿到三角形的三个顶点
             let a = vertices[t[0]]
             let b = vertices[t[1]]
             let c = vertices[t[2]]
             //light
+            // let [ap, bp, cp] = [a.position, b.position, c.position]
+            // let worldTriangle = [ap, bp, cp].map(v => world.transform(v))
             let worldTrianglePosition = [a.position, b.position, c.position].map(v => world.transform(v))
             let worldTriangleNormal = [a.n, b.n, c.n].map(v => rotation.transform(v))
-
+            // let [a2, b2, c2] = [a1, b1, c1].map(v => this.project(v, trans))
+            // log('worldTriangle', worldTriangle)
+            let n = worldTriangleNormal
             let tn = GuaVector.center(worldTriangleNormal[0], worldTriangleNormal[1], worldTriangleNormal[2])
 
-            // let cos = this.calculateWorldCos(this.light, worldTriangleNormal, worldTrianglePosition)
+            let cos = this.calculateWorldCos(this.light, worldTriangleNormal, worldTrianglePosition)
 
             let cn = GuaVector.new(5, 4, 10)
             // let cn = GuaVector.new(5, 5, 5)
@@ -508,10 +515,14 @@ class GuaCanvas extends GuaObject {
             if (backFlag >= 0) {
                 continue
             }
-
+            // if (backFlag  > 0.3) {
+            //     continue
+            // }
+            // 拿到屏幕上的 3 个像素点
+            // log("abc", a, b, c)
             let [v1, v2, v3] = [a, b, c].map(v => this.project(v, transform))
 
-            this.drawTriangle(v1, v2, v3, passName, tn, worldTrianglePosition)
+            this.drawTriangle(v1, v2, v3, cos, passName, tn, worldTrianglePosition)
             // break
         }
     }
@@ -525,19 +536,19 @@ class GuaCanvas extends GuaObject {
         return flag
     }
 
-    // calculateWorldCos(light, worldTriangleNormal, worldTrianglePosition) {
-    //   let p = worldTrianglePosition
-    //   let n = worldTriangleNormal
-    //   //三角形的中心点
-    //   let triCen = GuaVector.center(p[0], p[1], p[2])
-    //   //三角形的法向量
-    //   let tn = GuaVector.center(n[0],n[1],n[2])
-    //   //光线向量
-    //   let ln = triCen.sub(light)
-    //
-    //   let cos = ln.cos(tn)
-    //   return cos
-    // }
+    calculateWorldCos(light, worldTriangleNormal, worldTrianglePosition) {
+      let p = worldTrianglePosition
+      let n = worldTriangleNormal
+      //三角形的中心点
+      let triCen = GuaVector.center(p[0], p[1], p[2])
+      //三角形的法向量
+      let tn = GuaVector.center(n[0],n[1],n[2])
+      //光线向量
+      let ln = triCen.sub(light)
+
+      let cos = ln.cos(tn)
+      return cos
+    }
 
     drawImg(img) {
         let w = img.w

@@ -50,18 +50,11 @@ const __main = function() {
     canvas.render()
     log("gbuffer clear")
 
-        canvas.gbuffer.clear()
-        log("clear")
+    canvas.gbuffer.clear()
+    canvas.clear()
 
-        canvas.clear()
-
-        log(canvas.gbuffer.colorBuffer[0][0])
-        // canvas.render()
-
-        log("clear")
     setInterval(function () {
-      // canvas.gbuffer.clear()
-
+        canvas.gbuffer.clear()
         canvas.clear()
         log("clear")
         canvas.camera = GuaCamera.new()
